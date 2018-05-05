@@ -19,10 +19,8 @@ optional p = option () (try p *> pure ())
 prose :: Parser Prose
 prose = Prose <$> many1' letter
 
-s1 =
-
 separator :: Parser ()
-separator = many1 (space <|> s1 ) >> pure ()
+separator = many1 (space <|> satisfy (inClass ";“”*,.'")) >> pure ()
 
 wordParser :: String -> [Prose]
 wordParser str = case parseOnly wp (T.pack str) of
