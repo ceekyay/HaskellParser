@@ -16,25 +16,47 @@ data Prose = Prose {
 optional :: Parser a -> Parser ()
 optional p = option () (try p *> pure ())
 
-prose :: Parser Prose
-prose = Prose <$> many1' letter
+specialChars = ['-', '_', '…', '“', '”', '\"', '\'', '’', '@', '#', '$',
+                '%', '^', '&', '*', '(', ')', '+', '=', '~', '`', '{', '}',
+                '[', ']', '/', ':', ';', ',']
 
-separator :: Parser ()
-separator = many1 (space <|> satisfy (inClass "-_――…;:?“”!0-9*,.'’[]{}()#\"@$%^&+=/")) >> pure ()
+inputWords :: Parser Prose
+inputWords = Prose <$> many1' letter
+
+inputSentence :: Parser Prose
+inputSentence = Prose <$> many1' (letter <|> digit <|> space <|> satisfy (inClass specialChars))
+
+
+wordSeparator :: Parser ()
+wordSeparator = many1 (space <|> satisfy (inClass specialChars ) <|> satisfy (inClass "0-9――.?!")) >> pure ()
+
+sentenceSeparator :: Parser ()
+sentenceSeparator = many1 (space <|> satisfy (inClass ".?!")) >> pure ()
 
 wordParser :: String -> [Prose]
 wordParser str = case parseOnly wp (T.pack str) of
     Left err -> error err
     Right x -> x
     where
-        wp = optional separator *> prose `sepBy1` separator
+        wp = optional wordSeparator *> inputWords `sepBy1` wordSeparator
+
+sentenceParser :: String -> [Prose]
+sentenceParser str = case parseOnly wp (T.pack str) of
+    Left err -> error err
+    Right x -> x
+    where
+        wp = optional sentenceSeparator *> inputSentence `sepBy1` sentenceSeparator
+
 
 
 main :: IO()
 main = do
-  input <- readFile "input.txt"
+  input <- readFile "sample.txt"
   let words = wordParser input
-  print words
-  putStrLn "#######################################"
-  putStr "Number of words: "
-  print $ length words
+  let sentences = sentenceParser input
+  --print words
+  print sentences
+  --putStrLn "#######################################"
+  --putStr "Number of words: "
+  --print $ length words
+  print $ length sentences
