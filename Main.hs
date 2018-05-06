@@ -20,7 +20,7 @@ prose :: Parser Prose
 prose = Prose <$> many1' letter
 
 separator :: Parser ()
-separator = many1 (space <|> satisfy (inClass ";“”*,.'")) >> pure ()
+separator = many1 (space <|> satisfy (inClass "-_――;?“”*,.'")) >> pure ()
 
 wordParser :: String -> [Prose]
 wordParser str = case parseOnly wp (T.pack str) of
@@ -32,7 +32,8 @@ wordParser str = case parseOnly wp (T.pack str) of
 
 main :: IO()
 main = do
-  input <- readFile "small.txt"
+  input <- readFile "t1.txt"
   let words = wordParser input
-  print words
+  -- print words
+  putStr "Number of words: "
   print $ length words
