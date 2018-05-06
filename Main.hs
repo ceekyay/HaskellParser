@@ -8,10 +8,12 @@ import Data.Char
 import Data.List
 import Control.Applicative ((<*>), (*>), (<$>), (<|>), pure)
 
-
-data Prose = Prose {
+newtype Prose = Prose {
   word :: [Char]
-} deriving Show
+}
+
+instance Show Prose where
+  show a = word a
 
 optional :: Parser a -> Parser ()
 optional p = option () (try p *> pure ())
@@ -24,14 +26,13 @@ inputWords :: Parser Prose
 inputWords = Prose <$> many1' letter
 
 inputSentence :: Parser Prose
-inputSentence = Prose <$> many1' (letter <|> digit <|> space <|> satisfy (inClass specialChars))
-
+inputSentence = Prose <$> many1' (letter <|> digit <|> space <|> satisfy (inClass specialChars) <|> satisfy (inClass "――") )
 
 wordSeparator :: Parser ()
 wordSeparator = many1 (space <|> satisfy (inClass specialChars ) <|> satisfy (inClass "0-9――.?!")) >> pure ()
 
 sentenceSeparator :: Parser ()
-sentenceSeparator = many1 (space <|> satisfy (inClass ".?!")) >> pure ()
+sentenceSeparator = many1 (space <|> satisfy (inClass "*.?!")) >> pure ()
 
 wordParser :: String -> [Prose]
 wordParser str = case parseOnly wp (T.pack str) of
@@ -51,12 +52,13 @@ sentenceParser str = case parseOnly wp (T.pack str) of
 
 main :: IO()
 main = do
-  input <- readFile "sample.txt"
+  input <- readFile "sample1.txt"
   let words = wordParser input
   let sentences = sentenceParser input
   --print words
   print sentences
-  --putStrLn "#######################################"
+  --putStrLn (unwords sentences)
+  putStrLn "#######################################"
   --putStr "Number of words: "
   --print $ length words
   print $ length sentences
