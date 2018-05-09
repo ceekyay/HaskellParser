@@ -77,6 +77,9 @@ buildWord inp = map show ( wordParser inp)
 toAllLower :: [String] -> [String]
 toAllLower inp = map (map toLower) inp
 
+toDouble :: Integral a => a -> Double
+toDouble n = (fromIntegral n) :: Double
+
 numOfWords :: [String] -> Int
 numOfWords inp = length inp
 
@@ -113,8 +116,31 @@ compareBooks inp1 inp2 =
               filter (\x -> x `notElem` excludeWords) $ toAllLower inp2
   in filter (\xy -> xy `elem` text2) text1
 
---nSizeWords :: [String] -> Int -> [String]
---nSizeWords inp n
+nSizeWords :: [String] -> Int -> [String]
+nSizeWords ls n = map(\x -> (head x)) $ group $ sort $
+                  filter ((==n) . length) $ toAllLower ls
+
+matching :: String -> String -> Int -> Int
+matching s1 s2 d = length $ filter
+                   (\(c,i) -> not (null (matches s2 c i d)))
+                   (zip s1 [0..])
+
+matches :: Eq a => [a] -> a -> Int -> Int -> [Int]
+matches str c i d = filter (<= d) $
+                    map (dist i) (elemIndices c str)
+  where dist a b = abs $ a - b
+
+wordSimilarity :: String -> String -> Double
+wordSimilarity s1 s2
+  | m == 0    = 0.0
+  | otherwise = (1/3) * (m/ls1 + m/ls2 + (m-t)/m)
+  where ls1 = toDouble $ length s1
+        ls2 = toDouble $ length s2
+        m' = matching s1 s2 d
+        d = fromIntegral $
+            max (length s1) (length s2) `div` 2-1
+        m = toDouble m'
+        t = toDouble $ (m' - matching s1 s2 0) `div` 2
 
 
 main :: IO()
@@ -135,8 +161,10 @@ main = do
   let bookCompare = compareBooks book1 book2
   let unique = uniqueWords book1 commonWords
   let avgWord = avgWordLength book1
-  --let nWords = nSizeWords book1 9
-  --{--
+  let nWords = nSizeWords book1 13
+  let book2Longest = longestWord book2
+  let wSim = wordSimilarity longest book2Longest
+  {--
   putStrLn "\n############ INSIGHTS ############\n"
   putStr "1. Number of Words: "
   print nWords
@@ -165,6 +193,12 @@ main = do
   putStrLn "\n---------------------------------\n"
   putStr "11. Average Word Length: "
   print avgWord
+  putStrLn "\n---------------------------------\n"
+  putStr "12. Words with 'N' Length: "
+  print nWords
+  putStrLn "\n---------------------------------\n"
+  putStr "13. Similarity Index for 2 longest words from 2 different books: "
+  print wSim
   putStrLn "\n############## END ##############\n"
-   --x --}
-  --print avgWord
+  --}
+  --print nWords

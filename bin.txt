@@ -1,0 +1,13 @@
+computeEdits :: Eq a => [a] -> [a] -> Int
+computeEdits str1 str2 = nEdits (length str1) (length str2)
+  where nEdits = memoize edits
+        edits i j
+          | min i j == 0 = max i j
+          | otherwise = minimum
+          [(1 + nEdits (i-j)j)
+          , (1 + nEdits i (j-1))
+          , (ind i j + nEdits (i-1) (j-1) )]
+        ind i j
+          | str1 !! (i-1) == str2 !! (j-1) = 0
+          | otherwise = 1
+memoize = Memo.memo2 (Memo.integral) (Memo.integral)
