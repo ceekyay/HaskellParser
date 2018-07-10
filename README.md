@@ -1,2 +1,2 @@
 # HaskellParser
-Haskell based parser to parse huge chunks of English Prose. Learning to work with Attoparsec. 
+A text analytics tool implemented using Haskell and Attoparsec library. The program analyzes large chunks of data (English text) and provides 13 detailed insights into it. Most important insights include: List of unique words, Lexical Density, Jaro Distance between words and predictive analysis. Furthermore, it can compare two e-books given in .txt format. 
