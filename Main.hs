@@ -83,7 +83,7 @@ toDouble n = (fromIntegral n) :: Double
 numOfWords :: [String] -> Int
 numOfWords inp = length inp
 
-numOfSentences :: [String] -> Int
+numOfSentences :: String -> Int
 numOfSentences inp = length inp
 
 avgSentenceLength :: Int -> Int -> Float
@@ -142,29 +142,39 @@ wordSimilarity s1 s2
         m = toDouble m'
         t = toDouble $ (m' - matching s1 s2 0) `div` 2
 
+lexicalDensity :: [String] -> Float
+lexicalDensity inp =
+  let lexicalWords = fromIntegral $ length $ filter (\y -> y `notElem` excludeWords) inp
+      totalWords = fromIntegral $ numOfWords inp
+  in (lexicalWords/totalWords)*100
 
 main :: IO()
 main = do
+  --Book-1 Name goes here
   input <- readFile "sample1.txt"
+  --Book-2 Name goes here
   input2 <- readFile "sample2.txt"
+  --Dont rename this, because its part of another integral function.
   input3 <- readFile "common.txt"
   let book1 = buildWord input
   let book2 = buildWord input2
   let commonWords = buildWord input3
   --Calling all the main useful functions
   let nWords = numOfWords book1
-  let nSentences = numOfSentences book1
+  let nSentences = length $ sentenceParser input
   let avgSentLen = avgSentenceLength nWords nSentences
+  let para = paraParser input
   let longest = longestWord book1
   let topW = top10 book1
-  let requestedWord = userReqWord book1 ["happiness"]
+  let requestedWord = userReqWord book1 ["happiness", "plato"]
   let bookCompare = compareBooks book1 book2
   let unique = uniqueWords book1 commonWords
   let avgWord = avgWordLength book1
-  let nWords = nSizeWords book1 13
+  let wordsOfn = nSizeWords book1 13
   let book2Longest = longestWord book2
   let wSim = wordSimilarity longest book2Longest
-  {--
+  let lexicalDen = lexicalDensity book1
+  -- {--
   putStrLn "\n############ INSIGHTS ############\n"
   putStr "1. Number of Words: "
   print nWords
@@ -172,8 +182,8 @@ main = do
   print nSentences
   putStr "3. Average sentence length: "
   print avgSentLen
-  --putStr "4. Number of Paras in the text: "
-  --print para
+  putStr "4. Number of Paras in the text: "
+  print $ length para
   putStr "5. Longest Word in the text: "
   print longest
   putStrLn "\n---------------------------------\n"
@@ -183,22 +193,25 @@ main = do
   putStr "7. Occurencies of user requested word list: "
   print requestedWord
   putStrLn "\n---------------------------------\n"
-  putStr "8. Replaced the text with user request word. Check replace.txt "
-  putStrLn "\n---------------------------------\n"
-  putStr "9. List of Common words from 2 Books: "
+  --putStr "8. Replaced the text with user request word. Check replace.txt "
+  --putStrLn "\n---------------------------------\n"
+  putStr "8. List of Common words from 2 Books: "
   print bookCompare
   putStrLn "\n---------------------------------\n"
-  putStr "10. List of Unique words found in the text: "
+  putStr "9. List of Unique words found in the text: "
   print unique
   putStrLn "\n---------------------------------\n"
-  putStr "11. Average Word Length: "
+  putStr "10. Average Word Length: "
   print avgWord
   putStrLn "\n---------------------------------\n"
-  putStr "12. Words with 'N' Length: "
-  print nWords
+  putStr "11. Words with 'N' Length: "
+  print wordsOfn
   putStrLn "\n---------------------------------\n"
-  putStr "13. Similarity Index for 2 longest words from 2 different books: "
+  putStr "12. Similarity Index for 2 longest words from 2 different books: "
   print wSim
+  putStrLn "\n---------------------------------\n"
+  putStr "13. Lexical Density of the text: "
+  print lexicalDen
   putStrLn "\n############## END ##############\n"
-  --}
-  --print nWords
+
+  --x --}
